@@ -4,14 +4,14 @@ A date as a string is less reliable than an object instance, e.g. a Carbon-insta
 
 [Authentication](#authentication)
 
-[Create file functionality](#create-file-functionality)
 [Create file modal](#create-file-modal)
-[loadPdf function](#loadPdf-function)
-[Store file function](#store-file-function)
-  
-[Folders index page](#folders)
 
-[Files index page](#files)
+[loadPdf function](#loadPdf-function)
+
+[Store file function](#store-file-function)
+
+[Download file function](#download_file-function)
+  
 
 ### **authentication**
 
@@ -99,7 +99,9 @@ The $this->middleware('auth:sanctum')->only(['logout', 'user']); line specifies 
 
 ### **create-file-modal**
 
-resources\views\dashboard\file_view.blade.php:
+![App Logo](/images/files.png)
+
+`resources\views\dashboard\file_view.blade.php`
 
 ```html
 <x-layouts.dashboard>
@@ -280,7 +282,7 @@ It extracts the name of the selected file, removes the file extension, and sets 
 
 ### **store-file-function**
 
-app\Http\Controllers\Dashboard\FolderFileController.php:
+`app\Http\Controllers\Dashboard\FolderFileController.php`
 
 ```php
 public function store(Request $request, $id)
@@ -375,7 +377,7 @@ The `store` function ensures that the user has the 'admin' role, validates the r
 
 ### **upload_file-function**
 
-app\helpers.php:
+`app\helpers.php`
 
 ```php
 function upload_file($request_file, $prefix, $folder_name)
@@ -428,252 +430,39 @@ This function is responsible for handling the file upload process and returning 
 
 [🔝 Back to contents](#contents)
 
-### **folders**
+### **download_file-function**
 
-resources\views\dashboard\folder_view.blade.php:
+`app\Http\Controllers\Dashboard\FolderFileController.php`
 
-[🔝 Back to contents](#contents)
-
-### **files**
-
-resources\views\dashboard\file_view.blade.php:
-
-```html
-<x-layouts.dashboard>
-    <x-slot name="page">users.view</x-slot>
-    <x-slot name="title">{{ $user }} / {{ $title }} {{ __('custom.Files') }}</x-slot>
-    <x-slot name="card_title">{{ $user }} / {{ $title }} {{ __('custom.Files') }}</x-slot>
-    <x-slot name="script">
-        <script>
-            $(document).ready(function() {
-                $('#table').DataTable();
-            });
-        </script>
-    </x-slot>
-    <x-slot name="head">
-        <SCript>
-            var loadPdf = function(event) {
-                var name = event.target.files[0].name;
-                name = name.substr(0, name.lastIndexOf('.'));
-                document.getElementById('pdf-title').value = name;
-            }
-        </SCript>
-
-    </x-slot>
-    <STYle>
-        label.custom-file-button {
-            position: relative;
-        }
-
-        label.custom-file-button:before {
-            content: "📷 Take or upload picture";
-            position: absolute;
-            left: 0;
-            padding: 10px;
-            background: #1b87d5;
-            color: #fff;
-            width: auto;
-            text-align: center;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        label.custom-file-button:hover:before {
-            background: #146bac;
-        }
-
-        .custom-file-input {
-            visibility: hidden;
-        }
-    </STYle>
-    <div class="d-flex">
-        <button type="button" class="btn btn-success" style="margin-left: 900px;display:block;" data-toggle="modal"
-            data-target="#addModal">{{ __('custom.Add') }}</button>
-        <a href="{{ route('user_folders.folders.index', $folder->user_id) }}">
-            <button type="submit" class="btn btn-dark" style="margin-left: 20px">{{ __('custom.Back') }}</button></a>
-    </div>
-    <!-- Add Modal -->
-    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalTitle"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addModalLabel">{{ __('custom.Add File') }}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div id="add-error" class="alert alert-danger" style="color: red;display:none;">
-                        {{ __('custom.The entered values ​​are not valid') }}</div>
-                    <form method="post" action="{{ route('folder_files.files.store', [$folder->id]) }}"
-                        autocomplete="off" class="form-horizontal" enctype="multipart/form-data">
-                        @csrf
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label" for="input_file"
-                                style="margin-top: 40px">{{ __('custom.File') }}</label>
-                            <div class="col-sm-8">
-                                <div class="form-group{{ $errors->has('file') ? ' has-danger' : '' }}">
-                                    <input type="file" onchange="loadPdf(event)"
-                                        class="form-control{{ $errors->has('file') ? ' is-invalid' : '' }}"
-                                        name="file" id="input_file" />
-                                    <input type="file" name="custom-file-input" size="40"
-                                        class="wpcf7-form-control wpcf7-file" accept=".pdf" aria-invalid="false">
-                                    <label for="input_file" class="btn btn-primary mt-5 ml-3">Select File</label>
-                                    &nbsp;&nbsp;
-                                    <img id="file" class="rounded"
-                                        style="height:100px;width:100px;object-fit: cover; display:none">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <label class="col-sm-3 col-form-label" for="input-text-en">{{ __('custom.Title') }}</label>
-                            <div class="col-sm-8">
-                                <div class="form-group{{ $errors->has('title') ? ' has-danger' : '' }}">
-                                    <input class="form-control{{ $errors->has('title') ? ' is-invalid' : '' }}"
-                                        name="title" id="pdf-title" type="text" required="true" accept=".pdf"
-                                        aria-required="true" />
-                                    @if ($errors->has('title'))
-                                        <span id="title-error" class="error text-danger"
-                                            for="input-title">{{ $errors->first('title') }}</span>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer" style="border-top:none;">
-                            <button type="submit" class="btn btn-success">{{ __('custom.Add') }}</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- End Modal -->
-
-    <div class="table-responsive">
-        <table class="table" id="table">
-            <thead class=" text-primary">
-                <tr>
-                    <th class="text-center">{{ __('custom.File Title') }}</th>
-                    <th class="text-center">{{ __('custom.Creation Date') }}</th>
-                    <th class="text-center th-action">{{ __('custom.Actions') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($files as $file)
-                    <tr>
-                        <td class="text-center"><img src="/img/pdf-icon/pdf-icon.png"
-                                style="height:30px;width:30px;object-fit: cover;">
-                            {{ $file->title }}</td>
-                        <td class="text-center">{{ $file->created_at->diffForHumans() }}</td>
-                        <td class="td-actions text-center d-flex justify-content-center">
-                            <button type="button" rel="tooltip" class="btn btn-success btn-round" data-toggle="modal"
-                                data-target="#editModal{{ $file->id }}">
-                                <i class="material-icons" style=" display: contents;">edit</i>
-                            </button>
-                            {{-- Edit Modal --}}
-                            <form method="post"
-                                action="{{ route('folder_files.files.update', [$file->id, $file->folder_id]) }}"
-                                autocomplete="off" class="form-horizontal" enctype="multipart/form-data">
-                                @csrf
-                                @method('PUT')
-                                <div class="modal fade" id="editModal{{ $file->id }}" tabindex="-1"
-                                    role="dialog" aria-labelledby="editModalTitle" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="editModalLabel">
-                                                    {{ __('custom.Edit file title') }}</h5>
-                                                <button type="button" class="close" data-dismiss="modal"
-                                                    aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div id="add-error" class="alert alert-danger"
-                                                    style="color: red;display:none;">
-                                                    {{ __('custom.The entered values ​​are not valid') }}
-                                                </div>
-                                                <div class="row">
-                                                    <label class="col-sm-3 col-form-label"
-                                                        for="input-title-en">{{ __('custom.Title') }}</label>
-                                                    <div class="col-sm-8">
-                                                        <div
-                                                            class="form-group{{ $errors->has('title') ? ' has-danger' : '' }}">
-                                                            <input
-                                                                class="form-control{{ $errors->has('title') ? ' is-invalid' : '' }}"
-                                                                name="title" id="input-title-en" type="text"
-                                                                placeholder="{{ __('custom.Enter Title') }}"
-                                                                value="{{ $file->title }}" aria-required="true" />
-                                                            @if ($errors->has('title'))
-                                                                <span id="title-en-error" class="error text-danger"
-                                                                    for="input-title-en">{{ $errors->first('title') }}</span>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer" style="border-top:none;">
-                                                    <button type="submit"
-                                                        class="btn btn-success">{{ __('custom.Save') }}</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                            {{-- End Modal --}}
-                            <button type="button" data-toggle="modal"
-                                data-target="#exampleModal{{ $file->id }}" style="margin-inline: 6px;"
-                                rel="tooltip" class="btn btn-danger btn-round">
-                                <i class="material-icons" style=" display: contents;">close</i>
-                            </button>
-                            <form class="delete"
-                                action="{{ route('folder_files.files.destroy', [$file->id, $file->folder_id]) }}"
-                                method="POST">
-                                @csrf
-                                @method('DELETE')
-                                <!-- Modal -->
-                                <div class="modal fade" id="exampleModal{{ $file->id }}" tabindex="-1"
-                                    role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLabel">Hi @if (Auth::user()->name)
-                                                        {{ Auth::user()->name }}
-                                                    @endif !!! </h5>
-                                                <button type="button" class="close" data-dismiss="modal"
-                                                    aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <center>
-                                                <div class="modal-body">
-                                                    {{ __('custom.Are you sure you want to delete this file?') }}
-                                                </div>
-                                            </center>
-                                            <div class="modal-footer">
-                                                <button type="button" id="close" class="btn btn-secondary"
-                                                    style=" right: 30px;" data-dismiss="modal">Cancel</button>
-                                                <button type="submit" class="btn btn-danger">Delete</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                            &nbsp;
-                            <a href="{{ asset('storage'.DIRECTORY_SEPARATOR. $file->file) }} " target="_blank">
-                            <button type="button" rel="tooltip" class="btn btn-primary btn-round">
-                            <i class="material-icons" style=" display: contents;">download</i>
-                        </button>
-                    </a>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-</x-layouts.dashboard>
-
+```php
+public function download_file($id)
+{
+    $file = File::findOrFail($id);
+    $path = storage_path('app/public/' . $file->file);
+    $extension = pathinfo($file->file, PATHINFO_EXTENSION);
+    return Response::download($path, $file->title . '.' . $extension);
+}
 ```
+
+This function retrieves a file record based on the provided ID, determines the file path and extension, and generates a download response with the appropriate file name. This allows users to download the file from the server.
+## Step 1: Find the File
+```
+$file = File::findOrFail($id);
+```
+This line retrieves the file record from the database based on the provided `$id` using the `findOrFail` method. It assumes there is a model called `File` that represents the files in the system.
+
+## Step 2: Define the File Path and Extension
+```
+$path = storage_path('app/public/' . $file->file);
+$extension = pathinfo($file->file, PATHINFO_EXTENSION);
+```
+The function determines the file path by concatenating the storage path with the file's location stored in the `$file` object. It also extracts the file extension using the `pathinfo` function.
+
+## Step 3: Download the File
+```
+return Response::download($path, $file->title . '.' . $extension);
+```
+The function generates a download response using the `Response::download` method. It takes the file path and the desired filename as arguments. The desired filename is constructed by combining the original file's title from the `$file` object with the extracted extension.
+
 
 [🔝 Back to contents](#contents)
