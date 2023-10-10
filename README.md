@@ -1,7 +1,17 @@
 Project overview:
 
 A control panel for a file management system accessible through a website allows users to create, edit, and download PDF files, as well as organize them into folders.
+
+
+
+> :warning: **Warning:** This contents below ↓ contains just parts of my code.
+>                        You can access my full project files by clone it from my GitLab repository
+>                        (requires asking for my permissions to grant you access to it):
+>                        https://gitlab.com/skandar.s1998/grempel 
+
+
 ## Contents
+(contains descriptive parts of my code)
 
 [Login to the dashboard functionality](#dashboard-login)
 
